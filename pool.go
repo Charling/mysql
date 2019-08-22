@@ -15,13 +15,13 @@ var (
 	password string
 )
 
-func Starup(h, d, u, p string) *Conn {
+func Stratup(h, d, u, p string) *Conn {
 	host = h
 	database = d
 	user = u
 	password = p
 
-	ins = connectMySQL(host, database, user, password, "utf8", 2000, 1000)
+	ins = connectMySQL(host, database, user, password, "utf8", 20, 10)
 	if ins == nil {
 		LOGGER.Error("connect mysql failed ...")
 		return nil
@@ -45,9 +45,10 @@ func (s *Conn) reconnect() {
 		LOGGER.Error("close mysql failed ...")
 		return
 	}
-	ins = connectMySQL(host, database, user, password, "utf8", 2000, 1000)
+	ins = connectMySQL(host, database, user, password, "utf8", 20, 10)
 }
 
+//"database/sql"本身就是实现一个连接池，此处更多就是预防意外情况下做重连操作
 func (s *Conn) polling() {
 	defer Stack()
 
