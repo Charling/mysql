@@ -13,15 +13,19 @@ var (
 	database string
 	user string
 	password string
+	maxOpenNums int
+	maxIdelNums int
 )
 
-func Stratup(h, d, u, p string) *Conn {
+func Stratup(h, d, u, p string,openNums,idleNums int) *Conn {
 	host = h
 	database = d
 	user = u
 	password = p
+	maxOpenNums = openNums
+	maxIdelNums = idleNums
 
-	ins = connectMySQL(host, database, user, password, "utf8", 20, 10)
+	ins = connectMySQL(host, database, user, password, "utf8", maxOpenNums, maxIdelNums)
 	if ins == nil {
 		LOGGER.Error("connect mysql failed ...")
 		return nil
@@ -45,7 +49,7 @@ func (s *Conn) reconnect() {
 		LOGGER.Error("close mysql failed ...")
 		return
 	}
-	ins = connectMySQL(host, database, user, password, "utf8", 20, 10)
+	ins = connectMySQL(host, database, user, password, "utf8", maxOpenNums, maxIdelNums)
 }
 
 //"database/sql"本身就是实现一个连接池，此处更多就是预防意外情况下做重连操作

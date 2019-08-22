@@ -25,6 +25,7 @@ func connectMySQL(host, database, user, password, charset string, maxOpenConns, 
 		MaxIdleConns: maxIdleConns,
 	}
 	var err error
+	//sql.Open函数实际上是返回一个连接池对象，不是单个连接
 	db.SQLDB, err = sql.Open(db.DriverName, db.DataSourceName)
 	if err != nil {
 		LOGGER.Error("open mysql failed err=%v", err)
