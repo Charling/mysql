@@ -27,11 +27,11 @@ func connectMySQL(host, database, user, password, charset string, maxOpenConns, 
 	var err error
 	db.SQLDB, err = sql.Open(db.DriverName, db.DataSourceName)
 	if err != nil {
-		LOGGER.Error("open mysql failed err=", err)
+		LOGGER.Error("open mysql failed err=%v", err)
 		return nil
 	}
 	if err = db.SQLDB.Ping(); err != nil {
-		LOGGER.Error("ping mysql failed err=", err)
+		LOGGER.Error("ping mysql failed err=%v", err)
 		return nil
 	}
 	db.SQLDB.SetMaxOpenConns(db.MaxOpenConns)
