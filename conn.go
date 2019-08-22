@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	_ "github.com/go-sql-driver/mysql"
+	LOGGER "yn.com/ext/common/logger"
 )
 
 type Conn struct {
@@ -26,11 +27,11 @@ func connectMySQL(host, database, user, password, charset string, maxOpenConns, 
 	var err error
 	db.SQLDB, err = sql.Open(db.DriverName, db.DataSourceName)
 	if err != nil {
-		log.Println("open mysql failed err=", err)
+		LOGGER.Error("open mysql failed err=", err)
 		return nil
 	}
 	if err = db.SQLDB.Ping(); err != nil {
-		log.Println("ping mysql failed err=", err)
+		LOGGER.Error("ping mysql failed err=", err)
 		return nil
 	}
 	db.SQLDB.SetMaxOpenConns(db.MaxOpenConns)

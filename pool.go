@@ -4,6 +4,7 @@ import (
 	"log"
 	"yn.com/ext/common/gomsg"
 	"time"
+	LOGGER "yn.com/ext/common/logger"
 )
 
 var (
@@ -22,7 +23,7 @@ func Starup(h, d, u, p string) *Conn {
 
 	ins = connectMySQL(host, database, user, password, "utf8", 2000, 1000)
 	if ins == nil {
-		log.Println("connect mysql failed ...")
+		LOGGER.Error("connect mysql failed ...")
 		return nil
 	}
 
@@ -41,7 +42,7 @@ func Stack() {
 func (s *Conn) reconnect() {
 	err := ins.close()
 	if err != nil {
-		log.Println("close mysql failed ...")
+		LOGGER.Error("close mysql failed ...")
 		return
 	}
 	ins = connectMySQL(host, database, user, password, "utf8", 2000, 1000)
