@@ -1,7 +1,7 @@
 package mysql
 
 import (
-	"log"
+	//"log"
 	"yn.com/ext/common/gomsg"
 	"time"
 	LOGGER "yn.com/ext/common/logger"
