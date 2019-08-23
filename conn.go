@@ -52,10 +52,6 @@ func (db *Conn) execute(sqlStr string, args ...interface{}) (sql.Result, error) 
 	return db.SQLDB.Exec(sqlStr, args...)
 }
 
-func (db *Conn) GetDB() *sql.DB {
-	return db.SQLDB
-}
-
 func (db *Conn) Update(sqlStr string, args ...interface{}) (int64, error) {
 	res, err := db.execute(sqlStr, args...)
 	if err != nil {

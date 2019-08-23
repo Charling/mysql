@@ -2,68 +2,74 @@ package mysql
 
 import (
 	//"log"
-	"yn.com/ext/common/gomsg"
-	"time"
+	"database/sql" 
 	LOGGER "yn.com/ext/common/logger"
+	"time"
 )
 
-var (
-	ins *Conn
+type dbIndex struct {
+	index int
 	host string
 	database string
 	user string
 	password string
 	maxOpenNums int
 	maxIdelNums int
+}
+var (
+	mapConns map[dbIndex]*Conn
 )
 
-func Stratup(h, d, u, p string,openNums,idleNums int) *Conn {
-	host = h
-	database = d
-	user = u
-	password = p
-	maxOpenNums = openNums
-	maxIdelNums = idleNums
+func Startup() {
+	mapConns = make(map[dbIndex]*Conn)
+}
 
-	ins = connectMySQL(host, database, user, password, "utf8", maxOpenNums, maxIdelNums)
-	if ins == nil {
+func Connect(index int,h, d, u, p string,openNums,idleNums int) *Conn {
+	var idx dbIndex
+	idx.index = index
+	idx.host = h
+	idx.database = d
+	idx.user = u
+	idx.password = p
+	idx.maxOpenNums = openNums
+	idx.maxIdelNums = idleNums
+
+	conn := connectMySQL(idx.host, idx.database, idx.user, idx.password, "utf8", idx.maxOpenNums, idx.maxIdelNums)
+	if conn == nil {
 		LOGGER.Error("connect mysql failed ...")
 		return nil
 	}
 
-	go ins.polling()
-
-	return ins
+	mapConns[idx] = conn
+	return conn
 }
 
-func Stack() {
-	gomsg.Recover()
-
-	ins.reconnect()
-	go ins.polling()
+func StartWork() {
+	go func() {
+		timer := time.NewTicker(300 * time.Second)
+		for {
+			select {
+			case <-timer.C:
+				for idx,conn := range mapConns {
+					//conn.SQLDB本身就是连接池，此处只是定期做检测处理
+					err := conn.ping()
+					if err != nil {
+						conn.close()
+						Connect(idx.index,idx.host,idx.database,idx.user,idx.password,idx.maxOpenNums,idx.maxIdelNums)
+						break
+					}
+				}
+			}
+		}
+	}()
 }
 
-func (s *Conn) reconnect() {
-	err := ins.close()
-	if err != nil {
-		LOGGER.Error("close mysql failed ...")
-		return
-	}
-	ins = connectMySQL(host, database, user, password, "utf8", maxOpenNums, maxIdelNums)
-}
-
-//"database/sql"本身就是实现一个连接池，此处更多就是预防意外情况下做重连操作
-func (s *Conn) polling() {
-	defer Stack()
-
-	timer := time.NewTicker(300 * time.Second)
-	for {
-		select {
-		case <-timer.C:
-			err := ins.ping()
-			if err != nil {
-				ins.reconnect()
-			} 
+func GetMysqlDBConn(index int) *sql.DB {
+	for idx,_ := range mapConns {
+		if idx.index == index {
+			return mapConns[idx].SQLDB
 		}
 	}
+
+	return nil
 }
