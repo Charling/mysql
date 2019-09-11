@@ -3,7 +3,7 @@ package mysql
 import (
 	//"log"
 	"database/sql" 
-	LOGGER "yn.com/ext/common/logger"
+	LOGGER "github.yn.com/ext/common/logger"
 	"time"
 )
 

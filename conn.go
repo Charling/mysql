@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	_ "github.com/go-sql-driver/mysql"
-	LOGGER "yn.com/ext/common/logger"
+	LOGGER "github.yn.com/ext/common/logger"
 )
 
 type Conn struct {
